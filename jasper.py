@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 import random
 import pandas as pd
 import datetime
@@ -126,8 +128,14 @@ def work_jasper():
                 time.sleep(2)
                 input_editor.send_keys(prompt)
                 time.sleep(2)
-                compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
-                compose.click()
+                
+                # Highlight the command and perform
+                actions = ActionChains(browser)
+                input_editor.send_keys(Keys.CONTROL, "a")
+                actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
+
+                # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
+                # compose.click()
                 time.sleep(20)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')

@@ -39,22 +39,11 @@ def work_jasper():
         'verify_ssl': True
     }
 
-    # chrome_options = Options()
-    # # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-extensions")
-    # chrome_options.add_argument("--log-level=0")
-    # prefs = {
-    #     "profile.default_content_settings.popups": 0,
-    #     "download.default_directory" : r"D:\Work\UpDigital\financestrategist\erisapedia\csvfiles",
-    #     "directory_upgrade": True}
-    # chrome_options.add_experimental_option("prefs", prefs)
-
     options = {
         'user-agent': user_agents[random_user_agents]
         # 'suppress_connection_errors': True
     }
 
-    # browser = webdriver.Chrome(executable_path=r"D:\Work\UpDigital\financestrategist\erisapedia\chromedriver.exe", options=chrome_options)
     driver_path = os.path.join(directory,'chromedriver.exe')
     browser = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options)
 
@@ -65,10 +54,8 @@ def work_jasper():
 
     browser.get('https://app.jasper.ai/')
     uname = browser.find_element(By.ID, "email")
-    # upass = browser.find_element(By.XPATH, '//*[@id="login_info"]/p[2]/input')
 
     uname.send_keys(creds.USERNAME)
-    # upass.send_keys(creds.PASSWORD)
 
     # Click Recaptcha
     # WebDriverWait(browser, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")))
@@ -87,38 +74,24 @@ def work_jasper():
     signincode.submit()
     time.sleep(5)
 
-    templates_button = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')
-    templates_button.click()
     WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
     time.sleep(1)
 
-    # documents_button = browser.find_element(By.XPATH, '//*[@id="list"]/div[2]/button[1]')
-    # documents_button.click()
-    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
+    # WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
+    # Use for Google VM instance
+    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[1]/button'))).click()
     time.sleep(1)
-
-    # startfromscratch = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div')
-    # startfromscratch.click()
+    
     WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
     time.sleep(1)
 
-    # L_button = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]')
-    # L_button.click()
     WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(1)
 
     with open('query.csv') as f:
         reader = csv.DictReader(f)
 
-        # rows = list(reader)
-        # totalrow = len(rows)
-        # print(f"rows - {totalrow}")
-
         for line in reader:
-
-            # if totalrow == 1:
-            #     query_filename = line['query']
-            #     print(f"row - {query_filename}")
 
             prompt = line['prompt']
 
@@ -161,8 +134,6 @@ def work_jasper():
     df.index+=1
 
     filename = "jasper_composed" + now + ".csv"
-
-    # filename = "prospects_" + now + ".csv"
 
     print(f'{filename} saved sucessfully.\n')
 

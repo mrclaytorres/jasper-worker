@@ -26,6 +26,7 @@ def user_agent():
 
 def work_jasper():
     time_start = datetime.datetime.now().replace(microsecond=0)
+    directory = os.path.dirname(os.path.realpath(__file__))
 
     user_agents = user_agent()
 
@@ -54,7 +55,8 @@ def work_jasper():
     }
 
     # browser = webdriver.Chrome(executable_path=r"D:\Work\UpDigital\financestrategist\erisapedia\chromedriver.exe", options=chrome_options)
-    browser = webdriver.Chrome(executable_path=r"D:\Work\UpDigital\jasper\chromedriver.exe", seleniumwire_options=options)
+    driver_path = os.path.join(directory,'chromedriver.exe')
+    browser = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options)
 
     browser.set_window_size(1920, 1080)
 
@@ -81,9 +83,9 @@ def work_jasper():
     time.sleep(10)
 
     signincode = browser.find_element(By.ID, "signInCode")
-    time.sleep(2)
-    signincode.submit()
     time.sleep(10)
+    signincode.submit()
+    time.sleep(5)
 
     templates_button = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')
     templates_button.click()
@@ -157,7 +159,6 @@ def work_jasper():
     data = {"Prompt": prompt_list,"Composed": composed_list}
     df=pd.DataFrame(data=data)
     df.index+=1
-    directory = os.path.dirname(os.path.realpath(__file__))
 
     filename = "jasper_composed" + now + ".csv"
 

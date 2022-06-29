@@ -72,20 +72,20 @@ def work_jasper():
     signincode = browser.find_element(By.ID, "signInCode")
     time.sleep(10)
     signincode.submit()
-    time.sleep(5)
+    time.sleep(10)
 
-    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
+    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
     time.sleep(1)
 
-    # WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
+    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
     # Use for Google VM instance
-    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[1]/button'))).click()
+    # WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[1]/button'))).click()
     time.sleep(1)
     
-    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
+    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
     time.sleep(1)
 
-    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(1)
 
     with open('query.csv') as f:

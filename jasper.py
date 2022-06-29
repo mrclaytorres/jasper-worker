@@ -74,35 +74,35 @@ def work_jasper():
     
     # browser.switch_to.default_content()
 
-    time.sleep(5)
+    time.sleep(2)
 
     uname.submit()
 
-    time.sleep(20)
+    time.sleep(10)
 
     signincode = browser.find_element(By.ID, "signInCode")
-    time.sleep(5)
+    time.sleep(2)
     signincode.submit()
-    time.sleep(20)
+    time.sleep(10)
 
     templates_button = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')
     templates_button.click()
-    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
+    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
     time.sleep(1)
 
     # documents_button = browser.find_element(By.XPATH, '//*[@id="list"]/div[2]/button[1]')
     # documents_button.click()
-    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
+    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
     time.sleep(1)
 
     # startfromscratch = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div')
     # startfromscratch.click()
-    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
+    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
     time.sleep(1)
 
     # L_button = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]')
     # L_button.click()
-    WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+    WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(1)
 
     with open('query.csv') as f:
@@ -123,7 +123,7 @@ def work_jasper():
             try:
                 
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                input_editor = WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+                input_editor = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
                 time.sleep(2)
                 input_editor.send_keys(prompt)
@@ -136,13 +136,13 @@ def work_jasper():
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
                 # compose.click()
-                time.sleep(20)
+                time.sleep(10)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text)
                 print(f'{composed_prompt.text}\n')
                 prompt_list.append(prompt)
-                time.sleep(5)
+                time.sleep(2)
 
             except:
                 pass

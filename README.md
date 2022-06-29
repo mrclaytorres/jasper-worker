@@ -12,10 +12,10 @@ $ pip install -r requirements.txt
 * Assuming you already have an account to Jasper.ai.
 * Create a **creds.py** file in your project's root directory
         * Inside your **creds.py**, create your credentials like this:
-            ``` 
-            USERNAME = 'Your email/username here'
-            PASSWORD = 'Your password here'
-            ``` 
+``` 
+USERNAME = 'Your email/username here'
+PASSWORD = 'Your password here'
+```
 ### Jasper Signin Code
 * Jasper sends a Signin Code to your email/phone that you will have to manually input once the it prompts you.
 

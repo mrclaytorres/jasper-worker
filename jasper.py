@@ -106,27 +106,27 @@ def work_jasper():
 
                 # Perform a ENTER key press to generate a last child element
                 actions = ActionChains(browser)
-                actions.send_keys(Keys.ENTER).key_up(Keys.ENTER).perform()
+                # actions.send_keys(Keys.ENTER).key_up(Keys.ENTER).perform()
 
                 # last_child_command = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:last-child')))
-                cursor_position = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(3)')))
-                source_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(2)')))
-                target_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:last-child')))
+                # cursor_position = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(3)')))
+                # source_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(2)')))
+                # target_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:last-child')))
 
                 # Move the cursor to the last
-                actions.move_to_element(cursor_position).perform()
-                actions.move_by_offset(100, 0).perform()
+                # actions.move_to_element(cursor_position).perform()
+                # actions.move_by_offset(100, 0).perform()
                 
                 # Highlight the command and perform
-                actions.drag_and_drop(cursor_position, target_element).perform()
-                time.sleep(10)
+                # actions.drag_and_drop(cursor_position, target_element).perform()
+                # time.sleep(5)
             
                 # Execute the command
                 actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
                 # compose.click()
-                time.sleep(10)
+                time.sleep(5)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text)

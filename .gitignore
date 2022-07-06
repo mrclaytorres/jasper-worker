@@ -160,6 +160,7 @@ business_list*.csv
 *.xlsx
 !downloaded_files/.gitkeep
 !Sample_Input.csv
+!sample_query.csv
 
 # Credentials
 creds.py

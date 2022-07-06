@@ -102,11 +102,26 @@ def work_jasper():
                 input_editor.clear()
                 time.sleep(2)
                 input_editor.send_keys(prompt)
-                time.sleep(2)
+                time.sleep(3)
+
+                # Perform a ENTER key press to generate a last child element
+                actions = ActionChains(browser)
+                actions.send_keys(Keys.ENTER).key_up(Keys.ENTER).perform()
+
+                # last_child_command = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:last-child')))
+                cursor_position = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(3)')))
+                source_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:nth-last-child(2)')))
+                target_element = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.ql-editor>:last-child')))
+
+                # Move the cursor to the last
+                actions.move_to_element(cursor_position).perform()
+                actions.move_by_offset(100, 0).perform()
                 
                 # Highlight the command and perform
-                actions = ActionChains(browser)
-                input_editor.send_keys(Keys.CONTROL, "a")
+                actions.drag_and_drop(cursor_position, target_element).perform()
+                time.sleep(10)
+            
+                # Execute the command
                 actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')

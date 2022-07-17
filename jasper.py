@@ -100,9 +100,9 @@ def work_jasper():
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 input_editor = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
-                time.sleep(2)
-                input_editor.send_keys(prompt)
                 time.sleep(3)
+                input_editor.send_keys(prompt)
+                time.sleep(8)
 
                 # Perform a ENTER key press to generate a last child element
                 actions = ActionChains(browser)

@@ -51,6 +51,8 @@ def work_jasper():
 
     composed_list = []
     prompt_list = []
+    url_list = []
+    city_list = []
 
     browser.get('https://app.jasper.ai/')
     uname = browser.find_element(By.ID, "email")
@@ -94,6 +96,8 @@ def work_jasper():
         for line in reader:
 
             prompt = line['prompt']
+            url = line['URL']
+            city = line['City']
 
             try:
                 
@@ -132,6 +136,8 @@ def work_jasper():
                 composed_list.append(composed_prompt.text)
                 print(f'{composed_prompt.text}\n')
                 prompt_list.append(prompt)
+                url_list.append(url)
+                city_list.append(city)
                 time.sleep(2)
 
             except:
@@ -144,7 +150,7 @@ def work_jasper():
     # Save scraped URLs to a CSV file
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
-    data = {"Prompt": prompt_list,"Composed": composed_list}
+    data = {"URL": url_list, "City": city_list, "Prompt": prompt_list,"Composed": composed_list}
     df=pd.DataFrame(data=data)
     df.index+=1
 

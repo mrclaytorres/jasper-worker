@@ -133,11 +133,11 @@ def work_jasper():
                 time.sleep(5)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                composed_list.append(composed_prompt.text)
+                composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Unexpected error')
                 print(f'{composed_prompt.text}\n')
-                prompt_list.append(prompt)
-                url_list.append(url)
-                city_list.append(city)
+                prompt_list.append(prompt if prompt != '' else 'Unexpected error')
+                url_list.append(url if url != '' else 'Unexpected error')
+                city_list.append(city if city != '' else 'Unexpected error')
                 time.sleep(2)
 
             except:

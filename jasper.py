@@ -141,6 +141,10 @@ def work_jasper():
                 time.sleep(2)
 
             except:
+                composed_list.append('Unexpected error')
+                prompt_list.append(prompt if prompt != '' else 'Unexpected error')
+                url_list.append(url if url != '' else 'Unexpected error')
+                city_list.append(city if city != '' else 'Unexpected error')
                 pass
 
     time_end = datetime.datetime.now().replace(microsecond=0)

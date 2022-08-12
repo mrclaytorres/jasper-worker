@@ -109,8 +109,10 @@ def work_jasper():
                 input_editor.send_keys(Keys.CONTROL, "a")
                 actions.key_down(Keys.CONTROL).send_keys("e").key_up(Keys.CONTROL).perform()
 
-                # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
-                # compose.click()
+                # Replace text
+                replace_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div/button[1]')))
+                replace_text.click()
+
                 time.sleep(10)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
@@ -120,6 +122,8 @@ def work_jasper():
                 time.sleep(2)
 
             except:
+                prompt_list.append(prompt)
+                composed_list.append('Unexpected error occured / Please select fewer characters')
                 pass
 
     time_end = datetime.datetime.now().replace(microsecond=0)
@@ -133,7 +137,7 @@ def work_jasper():
     df=pd.DataFrame(data=data)
     df.index+=1
 
-    filename = "jasper_composed" + now + ".csv"
+    filename = "jasper_rephrased" + now + ".csv"
 
     print(f'{filename} saved sucessfully.\n')
 

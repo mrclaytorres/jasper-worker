@@ -111,6 +111,7 @@ def work_jasper():
 
                 # Replace text
                 replace_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div/button[1]')))
+                time.sleep(2)
                 replace_text.click()
 
                 time.sleep(10)
@@ -123,7 +124,7 @@ def work_jasper():
 
             except:
                 prompt_list.append(prompt)
-                composed_list.append('Unexpected error occured / Please select fewer characters')
+                composed_list.append('Unexpected error occured.')
                 pass
 
     time_end = datetime.datetime.now().replace(microsecond=0)

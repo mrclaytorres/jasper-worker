@@ -88,7 +88,7 @@ def work_jasper():
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(1)
 
-    with open('query.csv') as f:
+    with open('prompt.csv') as f:
         reader = csv.DictReader(f)
 
         for line in reader:
@@ -107,7 +107,7 @@ def work_jasper():
                 # Highlight the command and perform
                 actions = ActionChains(browser)
                 input_editor.send_keys(Keys.CONTROL, "a")
-                actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
+                actions.key_down(Keys.CONTROL).send_keys("e").key_up(Keys.CONTROL).perform()
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
                 # compose.click()

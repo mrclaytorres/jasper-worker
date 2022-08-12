@@ -133,7 +133,7 @@ def work_jasper():
     # Save scraped URLs to a CSV file
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
-    data = {"Prompt": prompt_list,"Composed": composed_list}
+    data = {"Prompt": prompt_list,"Rephrased": composed_list}
     df=pd.DataFrame(data=data)
     df.index+=1
 

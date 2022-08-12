@@ -88,7 +88,7 @@ def work_jasper():
     time.sleep(1)
 
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
-    time.sleep(1)
+    time.sleep(3)
 
     with open('query.csv') as f:
         reader = csv.DictReader(f)
@@ -102,7 +102,7 @@ def work_jasper():
             try:
                 
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                input_editor = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+                input_editor = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
                 time.sleep(3)
                 input_editor.send_keys(prompt)

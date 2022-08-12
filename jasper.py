@@ -117,13 +117,13 @@ def work_jasper():
                 time.sleep(10)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                composed_list.append(composed_prompt.text)
+                composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Empty prompt')
                 print(f'{composed_prompt.text}\n')
-                prompt_list.append(prompt)
+                prompt_list.append(prompt if prompt != '' else 'Empty prompt')
                 time.sleep(2)
 
             except:
-                prompt_list.append(prompt)
+                prompt_list.append(prompt if prompt != '' else 'Empty prompt')
                 composed_list.append('Unexpected error occured.')
                 pass
 

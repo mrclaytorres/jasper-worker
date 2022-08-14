@@ -144,7 +144,10 @@ proxy_list.txt
 settings_nordvpn.txt
 
 # Selenium Driver
-chromedriver.exe
+chromedriver*
+
+# VScode workspace settings
+.vscode
 
 # csvfiles but include folder container
 proxy_list.csv

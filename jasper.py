@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+
 # from selenium import webdriver
 from seleniumwire import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,13 +10,12 @@ from selenium.webdriver.common.keys import Keys
 import random
 import pandas as pd
 import datetime
-import sys
 import os
 import os.path
 import time
 import csv
-import re
 import creds
+import glob
 
 def user_agent():
     user_agent_list = []
@@ -44,7 +44,7 @@ def work_jasper():
         # 'suppress_connection_errors': True
     }
 
-    driver_path = os.path.join(directory,'chromedriver.exe')
+    driver_path = os.path.join(directory, glob.glob('./chromedriver*')[0])
     browser = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options)
 
     browser.set_window_size(1920, 1080)
@@ -130,14 +130,14 @@ def work_jasper():
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
     data = {"Prompt": prompt_list,"Composed": composed_list}
-    df=pd.DataFrame(data=data)
-    df.index+=1
+    df = pd.DataFrame(data=data)
+    df.index += 1
 
-    filename = "jasper_composed" + now + ".csv"
+    filename = f"jasper_composed{ now }.csv"
 
     print(f'{filename} saved sucessfully.\n')
 
-    file_path = os.path.join(directory,'csvfiles/', filename)
+    file_path = os.path.join(directory, 'csvfiles/', filename)
     df.to_csv(file_path)
 
     browser.quit()

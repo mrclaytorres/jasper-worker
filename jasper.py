@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # from selenium import webdriver
+import os
 from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -8,143 +9,160 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 import random
-import pandas as pd
 import datetime
-import os
-import os.path
 import time
-import csv
 import creds
 import glob
 
-def user_agent():
-    user_agent_list = []
-    with open('user_agents.csv', 'r') as f:
-        for agents in f:
-            user_agent_list.append(agents)
-    return user_agent_list
+def get_random_user_agent():
+    with open('user_agents.csv', 'r') as f_ua:
+        return random.choice(f_ua.readlines())
 
-def work_jasper():
-    time_start = datetime.datetime.now().replace(microsecond=0)
-    directory = os.path.dirname(os.path.realpath(__file__))
+def login_jasper():
+    # Login into Jasper and save the session cookies
+    print(':: Starting login step')
 
-    user_agents = user_agent()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(f'user-agent={get_random_user_agent()}')
+    chrome_options.add_argument('user-data-dir=./chrome-prefs')
 
-    # Setup random proxy and user-agent
-    random_user_agents = random.randint(1, len(user_agents) - 1)
-    print(user_agents[random_user_agents])
-    options = {
-        'user-agent': user_agents[random_user_agents],
-        'suppress_connection_errors': True,
-        'verify_ssl': True
-    }
+    driver_path = glob.glob('./chromedriver*')[0]
+    print(f':: Found driver path : {driver_path}')
 
-    options = {
-        'user-agent': user_agents[random_user_agents]
-        # 'suppress_connection_errors': True
-    }
+    print(':: Starting webdriver Chrome...')
+    browser_handle = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
 
-    driver_path = os.path.join(directory, glob.glob('./chromedriver*')[0])
-    browser = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options)
+    print(':: Setting window size...')
+    browser_handle.set_window_size(1920, 1080)
 
-    browser.set_window_size(1920, 1080)
+    print(':: Getting Jasper.ai...')
+    browser_handle.get('https://app.jasper.ai/')
+
+    try:
+        print(':: Waiting until we have an email address field (Expecting a timeout otherwise)')
+        WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/div/div[3]/div/form/div[1]/div/input')))
+    except:
+        # Assume we're already logged-in
+        print('\n:: Caught TimeoutException, assuming already logged-in.')
+        return
+
+    print(':: Submitting username keys...')
+    username_field = browser_handle.find_element(By.ID, 'email')
+    username_field.clear()
+    username_field.send_keys(creds.USERNAME)
+    username_field.submit()
+
+    # User will now manually log-in
+    # So we'll wait 10 minutes 'till we have a dashboard available
+    print(f'\n:: Please enter the code sent at {creds.USERNAME} - waiting 10 minutes for you to do it.\n')
+    WebDriverWait(browser_handle, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')))
+    
+    print(':: Found Jasper.ai dashboard, login process finished !')
+    print(':: Closing window.')
+    browser_handle.close()
+
+def run_prompts(prompts_list):
+    # Initialize a new browser window
+    # Assume we're already logged-in
+    print('\n:: Starting prompt step')
+    print(f':: Prompts to generate : {len(prompts_list)}')
+
+    print(':: Initializing webdriver...')
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(f'user-agent={get_random_user_agent()}')
+    chrome_options.add_argument('user-data-dir=./chrome-prefs')
+
+    driver_path = glob.glob('./chromedriver*')[0]
+    print(f':: Found driver path : {driver_path}')
+
+    print(':: Starting webdriver Chrome...')
+    browser_handle = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
+
+    print(':: Setting window size...')
+    browser_handle.set_window_size(1920, 1080)
+
+    print(':: Getting Jasper.ai...')
+    browser_handle.get('https://app.jasper.ai/')
+
+    print(':: Entering edit page...')
+    WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
+    WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
+    WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
+    WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
 
     composed_list = []
-    prompt_list = []
 
-    browser.get('https://app.jasper.ai/')
-    uname = browser.find_element(By.ID, "email")
+    for prompt_line in prompts_list:
+            print('\n:: Clearing ql-editor')
+            input_editor = WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+            time.sleep(10)
+            input_editor.clear()
+            time.sleep(2)
 
-    uname.send_keys(creds.USERNAME)
+            print(':: Sending prompt keys')
+            input_editor.send_keys(prompt_line)
+            time.sleep(2)
+            
+            print(':: Highlighting the prompt and generating...')
+            actions = ActionChains(browser_handle)
+            input_editor.send_keys(Keys.CONTROL, "a")
+            actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
 
-    # Click Recaptcha
-    # WebDriverWait(browser, 10).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR,"iframe[name^='a-'][src^='https://www.google.com/recaptcha/api2/anchor?']")))
-    # WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="recaptcha-anchor"]'))).click()
-    
-    # browser.switch_to.default_content()
+            print(':: Waiting for Jasper to finish...')
+            time.sleep(15)
 
-    time.sleep(2)
+            print(':: Saving composed prompt...')
+            composed_prompt = browser_handle.find_element(By.CLASS_NAME, 'ql-editor')
+            composed_list.append([prompt_line, composed_prompt.text])
+            time.sleep(2)
 
-    uname.submit()
+    print(':: Closing browser...')
+    browser_handle.quit()
 
-    time.sleep(10)
+    return composed_list
 
-    signincode = browser.find_element(By.ID, "signInCode")
-    time.sleep(10)
-    signincode.submit()
-    time.sleep(10)
-
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]'))).click()
-    time.sleep(1)
-
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[2]/button[1]'))).click()
-    # Use for Google VM instance
-    # WebDriverWait(browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="list"]/div[1]/button'))).click()
-    time.sleep(1)
-    
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
-    time.sleep(1)
-
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
-    time.sleep(1)
-
-    with open('query.csv') as f:
-        reader = csv.DictReader(f)
-
-        for line in reader:
-
-            prompt = line['prompt']
-
-            try:
-                
-                # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                input_editor = WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
-                input_editor.clear()
-                time.sleep(2)
-                input_editor.send_keys(prompt)
-                time.sleep(2)
-                
-                # Highlight the command and perform
-                actions = ActionChains(browser)
-                input_editor.send_keys(Keys.CONTROL, "a")
-                actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
-
-                # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
-                # compose.click()
-                time.sleep(10)
-
-                composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                composed_list.append(composed_prompt.text)
-                print(f'{composed_prompt.text}\n')
-                prompt_list.append(prompt)
-                time.sleep(2)
-
-            except:
-                pass
-
-    time_end = datetime.datetime.now().replace(microsecond=0)
-    runtime = time_end - time_start
-    print(f"Script runtime: {runtime}.\n")
-
-    # Save scraped URLs to a CSV file
-    now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
-    print('Saving to a CSV file...\n')
-    data = {"Prompt": prompt_list,"Composed": composed_list}
-    df = pd.DataFrame(data=data)
-    df.index += 1
-
-    filename = f"jasper_composed{ now }.csv"
-
-    print(f'{filename} saved sucessfully.\n')
-
-    file_path = os.path.join(directory, 'csvfiles/', filename)
-    df.to_csv(file_path)
-
-    browser.quit()
-
-    time_end = datetime.datetime.now().replace(microsecond=0)
-    runtime = time_end - time_start
-    print(f"Script runtime: {runtime}.\n")
+def split_list(lst, n):
+    # Yield successive n-sized chunks from lst.
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 if __name__ == '__main__':
-    work_jasper()
+    print(':: Jasper auto prompt script')
+    print('----------------------------')
+    
+    print('\n:: Loading prompts in-memory...\n')
+    f_prompts = open('query.csv', 'r')
+    prompts_list = f_prompts.readlines()
+    f_prompts.close()
+
+    login_jasper()
+
+    time_start = datetime.datetime.now().replace(microsecond=0)
+    now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
+
+    for prompts_block in split_list(prompts_list, 50):
+        composed_list = run_prompts(prompts_block)
+
+        print('\n:: Saving composed prompts to filesystem...\n')
+
+        os.makedirs('./csvfiles/', exist_ok=True)
+
+        with open(f'csvfiles/jasper_composed_{now}.csv', 'a') as f_composed:
+            for composed_line in composed_list:
+                f_composed.write(f'"{str(composed_line[0]).rstrip()}","{str(composed_line[1]).rstrip()}"\n')
+        
+        if len(prompts_block) < 50:
+            # No need to wait after finishing the last prompt block
+            break
+
+        hours_waiting = random.randint(2, 12)
+        print(f':: Waiting for {hours_waiting} hours...\n')
+        time.sleep(60 * 60 * hours_waiting)
+
+    time_end = datetime.datetime.now().replace(microsecond=0)
+    runtime = time_end - time_start
+
+    print('\n:: Script done !')
+    print(':: Stats -------------------------')
+    print(f':: Script runtime : {runtime}')
+    print(f':: Composed prompts : {len(prompts_list)}\n')

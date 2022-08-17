@@ -167,3 +167,5 @@ business_list*.csv
 
 # Credentials
 creds.py
+
+chrome-prefs

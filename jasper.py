@@ -16,6 +16,7 @@ import time
 import csv
 import re
 import creds
+import glob
 
 def user_agent():
     user_agent_list = []
@@ -44,7 +45,7 @@ def work_jasper():
         # 'suppress_connection_errors': True
     }
 
-    driver_path = os.path.join(directory,'chromedriver.exe')
+    driver_path = os.path.join(directory, glob.glob('./chromedriver*')[0])
     browser = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options)
 
     browser.set_window_size(1920, 1080)
@@ -158,7 +159,7 @@ def work_jasper():
     df=pd.DataFrame(data=data)
     df.index+=1
 
-    filename = "jasper_composed" + now + ".csv"
+    filename = f"jasper_composed{ now }.csv"
 
     print(f'{filename} saved sucessfully.\n')
 

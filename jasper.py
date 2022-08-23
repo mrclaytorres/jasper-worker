@@ -73,7 +73,7 @@ def work_jasper():
     time.sleep(10)
 
     signincode = browser.find_element(By.ID, "signInCode")
-    time.sleep(15)
+    time.sleep(25)
     signincode.submit()
     time.sleep(10)
 

@@ -88,7 +88,7 @@ def work_jasper():
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(3)
 
-    with open('rephrase_prompt.csv', encoding="utf8") as f:
+    with open('rephrase_prompt.csv', encoding="unicode_escape") as f:
         reader = csv.DictReader(f)
 
         for line in reader:

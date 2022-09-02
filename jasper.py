@@ -25,6 +25,14 @@ def user_agent():
             user_agent_list.append(agents)
     return user_agent_list
 
+def convert_row( row ):
+    row_dict = {}
+    for key, value in row.items():
+        keyAscii = key.encode('ascii', 'ignore' ).decode()
+        valueAscii = value.encode('ascii','ignore').decode()
+        row_dict[ keyAscii ] = valueAscii
+    return row_dict
+
 def work_jasper():
     time_start = datetime.datetime.now().replace(microsecond=0)
     directory = os.path.dirname(os.path.realpath(__file__))
@@ -91,19 +99,20 @@ def work_jasper():
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
     time.sleep(3)
 
-    with open('query.csv') as f:
+    with open('query.csv', encoding='unicode_escape') as f:
         reader = csv.DictReader(f)
 
         for line in reader:
 
-            prompt = line['prompt']
-            url = line['URL']
-            city = line['City']
+            converted_row = convert_row( line )
+            prompt = converted_row['prompt']
+            url = converted_row['URL']
+            city = converted_row['City']
 
             try:
                 
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                input_editor = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+                input_editor = WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
                 time.sleep(3)
                 input_editor.send_keys(prompt)

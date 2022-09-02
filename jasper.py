@@ -24,6 +24,14 @@ def user_agent():
             user_agent_list.append(agents)
     return user_agent_list
 
+def convert_row( row ):
+    row_dict = {}
+    for key, value in row.items():
+        keyAscii = key.encode('ascii', 'ignore' ).decode()
+        valueAscii = value.encode('ascii','ignore').decode()
+        row_dict[ keyAscii ] = valueAscii
+    return row_dict
+
 def work_jasper():
     time_start = datetime.datetime.now().replace(microsecond=0)
     directory = os.path.dirname(os.path.realpath(__file__))
@@ -93,10 +101,11 @@ def work_jasper():
 
         for line in reader:
 
-            prompt = line['prompt']
+            converted_row = convert_row( line )
+            prompt = converted_row['prompt']
+            print(f'prompt - {prompt}\n')
             
             try:
-                print(f'prompt - {prompt}\n')
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 input_editor = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()

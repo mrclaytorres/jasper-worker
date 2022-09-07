@@ -164,6 +164,7 @@ def work_jasper():
     # Save scraped URLs to a CSV file
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
+    print(f'URL: {len(url_list)}, City: {len(city_list)}, Prompt: {len(prompt_list)}, Composed: {len(composed_list)}\n')
     data = {"URL": url_list, "City": city_list, "Prompt": prompt_list,"Composed": composed_list}
     df = pd.DataFrame.from_dict(data, orient='index')
     # df.index+=1

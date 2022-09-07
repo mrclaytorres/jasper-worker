@@ -165,8 +165,9 @@ def work_jasper():
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
     data = {"URL": url_list, "City": city_list, "Prompt": prompt_list,"Composed": composed_list}
-    df=pd.DataFrame(data=data)
-    df.index+=1
+    df = pd.DataFrame.from_dict(data, orient='index')
+    # df.index+=1
+    df = df.transpose()
 
     filename = f"jasper_composed{ now }.csv"
 

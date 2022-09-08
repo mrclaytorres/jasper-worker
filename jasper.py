@@ -144,9 +144,11 @@ def work_jasper():
     # Save scraped URLs to a CSV file
     now = datetime.datetime.now().strftime('%Y%m%d-%Hh%M')
     print('Saving to a CSV file...\n')
+    print(f'Prompt: {len(prompt_list)}, Rephrased: {len(composed_list)}\n')
     data = {"Prompt": prompt_list,"Rephrased": composed_list}
-    df=pd.DataFrame(data=data)
-    df.index+=1
+    df = pd.DataFrame.from_dict(data, orient='index')
+    # df.index+=1
+    df = df.transpose()
 
     filename = "jasper_rephrased" + now + ".csv"
 

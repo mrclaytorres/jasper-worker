@@ -109,28 +109,28 @@ def work_jasper():
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 input_editor = WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
-                time.sleep(10)
+                time.sleep(5)
                 input_editor.send_keys(prompt)
-                time.sleep(10)
+                time.sleep(7)
                 
                 # Highlight the command and perform
                 actions = ActionChains(browser)
                 input_editor.send_keys(Keys.CONTROL, "a")
                 actions.key_down(Keys.CONTROL).send_keys("e").key_up(Keys.CONTROL).perform()
-                time.sleep(10)
+                time.sleep(8)
 
                 # Replace text
                 replace_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div/button[1]')))
                 time.sleep(3)
                 replace_text.click()
 
-                time.sleep(10)
+                time.sleep(5)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Empty prompt')
                 print(f'{composed_prompt.text}\n')
                 prompt_list.append(prompt if prompt != '' else 'Empty prompt')
-                time.sleep(10)
+                time.sleep(8)
 
             except:
                 prompt_list.append(prompt if prompt != '' else 'Empty prompt')

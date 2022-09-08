@@ -81,7 +81,7 @@ def work_jasper():
     time.sleep(10)
 
     signincode = browser.find_element(By.ID, "signInCode")
-    time.sleep(25)
+    time.sleep(20)
     signincode.submit()
     time.sleep(10)
 
@@ -114,9 +114,9 @@ def work_jasper():
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 input_editor = WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
-                time.sleep(10)
+                time.sleep(7)
                 input_editor.send_keys(prompt)
-                time.sleep(10)
+                time.sleep(8)
 
                 # Perform a ENTER key press to generate a last child element
                 actions = ActionChains(browser)
@@ -140,7 +140,7 @@ def work_jasper():
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
                 # compose.click()
-                time.sleep(20)
+                time.sleep(15)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Unexpected error')
@@ -148,7 +148,7 @@ def work_jasper():
                 prompt_list.append(prompt if prompt != '' else 'Unexpected error')
                 url_list.append(url if url != '' else 'Unexpected error')
                 city_list.append(city if city != '' else 'Unexpected error')
-                time.sleep(10)
+                time.sleep(5)
 
             except:
                 composed_list.append('Unexpected error')

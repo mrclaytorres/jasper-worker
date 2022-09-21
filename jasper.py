@@ -84,7 +84,7 @@ def work_jasper():
 
     try:
         
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[1]/div[1]/div/nav[1]/ul[2]/li'))).click()
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[1]/div/nav[1]/ul[2]/li'))).click()
         time.sleep(1)
 
         WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[1]/div[3]/article/div/div/div/div[2]/div[2]/a[1]/div'))).click()

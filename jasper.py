@@ -93,7 +93,7 @@ def work_jasper():
         WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[1]/div[3]/article/div/div[2]/button'))).click()
         time.sleep(5)
 
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[4]/div/div[1]/div[2]/div[2]/button[3]'))).click()
         time.sleep(5)
 
     except:
@@ -109,7 +109,7 @@ def work_jasper():
         WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
         time.sleep(1)
 
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[4]/div/div[1]/div[2]/div[2]/button[3]'))).click()
         time.sleep(3)
 
     with open('rephrase_prompt.csv', encoding="unicode_escape") as f:

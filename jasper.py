@@ -124,31 +124,35 @@ def work_jasper():
             try:
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 input_editor = WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+                print(f'QL Editor detected.\n')
                 input_editor.clear()
-                time.sleep(5)
+                time.sleep(4)
+                print(f'QL Editor cleared.\n')
                 input_editor.send_keys(prompt)
-                time.sleep(7)
+                time.sleep(5)
+                print(f'Prompt pasted.\n')
                 
                 # Highlight the command and perform
                 actions = ActionChains(browser)
                 input_editor.send_keys(Keys.CONTROL, "a")
                 actions.key_down(Keys.CONTROL).send_keys("e").key_up(Keys.CONTROL).perform()
-                time.sleep(8)
+                time.sleep(20)
+                print(f'Rewriting done.\n')
 
-                replace_text_parent = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div')
-                replace_div = replace_text_parent.find_element(By.CLASS_NAME, 'fixed z-10')
                 # Replace text
-                replace_text = WebDriverWait(replace_div, 10).until(EC.presence_of_element_located((By.XPATH, './/div/div/button[1]')))
+                replace_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[4]/div/div/button[1]')))
                 time.sleep(3)
                 replace_text.click()
+                print(f'Replace done.\n')
 
-                time.sleep(5)
+                time.sleep(4)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Empty prompt')
                 print(f'{composed_prompt.text}\n')
                 prompt_list.append(prompt if prompt != '' else 'Empty prompt')
-                time.sleep(8)
+                print(f'Entry saved.\n')
+                time.sleep(7)
 
             except:
                 prompt_list.append(prompt if prompt != '' else 'Empty prompt')

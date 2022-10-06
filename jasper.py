@@ -135,8 +135,10 @@ def work_jasper():
                 actions.key_down(Keys.CONTROL).send_keys("e").key_up(Keys.CONTROL).perform()
                 time.sleep(8)
 
+                replace_text_parent = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div')
+                replace_div = replace_text_parent.find_element(By.CLASS_NAME, 'fixed z-10')
                 # Replace text
-                replace_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div/button[1]')))
+                replace_text = WebDriverWait(replace_div, 10).until(EC.presence_of_element_located((By.XPATH, './/div/div/button[1]')))
                 time.sleep(3)
                 replace_text.click()
 

@@ -1,37 +1,41 @@
-# Jasper Worker
+# Jasper Worker (erwangse)
 
-### Install Dependencies
+> This is a fork that uses a JSON file for feeding sentences to Jasper Worker.
+> It also supports other helper scripts & experimental options.
+
+## Install Dependencies
 ```
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
-### Download Chrome Webdriver
+## Webdriver / Chromedriver
+
+Jasper Worker functions by automatically controlling a browser window.
+Though, to do so, you will need to download a *webdriver* that supports your installed browser version.
+
 * [Download Chrome's webdriver](https://chromedriver.chromium.org/downloads) and save it on root directory.
   * Make sure you download the webdriver that's compatible with your current Google Chrome.
 
-### Create Your Credentials
-* Assuming you already have an account to Jasper.ai.
-* Create a **creds.py** file in your project's root directory
-  * Inside your **creds.py**, create your credentials like this:
-``` 
-USERNAME = 'Your email/username here'
-PASSWORD = 'Your password here'
+> Note: While you can download & use other drivers such as *Geckodriver* for Firefox,
+> doing so is not supported.
+
+## Credentials
+Assuming you already have an account to Jasper.ai,
+* Rename the `creds.json.sample` to `creds.json` file in the project's root directory, and fill in your Jasper.ai credentials.
+
+## 2FA / Sign-in Code
+* If Jasper.ai sends a Sign-in Code to your email and/or phone, you will have to manually enter it.
+
+## Queries / Sentences
+* Rename the `query.json.sample` file to `query.json` and enter in your sentences as strings.
+
+## User Agents (UAs)
+* Rename the file called `ua.json.sample` to `ua.json` and enter at least 2 User Agent strings.
+
+## Output
+* Jasper Worker will automatically save the generated prompts to a file in the `output` folder. It will be automatically generated if it doesn't exist.
+
+## Running Jasper Worker
 ```
-### Jasper Signin Code
-* Jasper sends a Signin Code to your email/phone that you will have to manually input once the it prompts you.
-
-### Create Input File
-* Rename the `sample_query.csv` file to `query.csv`
-* Inside the query.csv are the one input parameters
-    * prompt - The prompt you input in Jasper's QL Editor.
-
-### Create User Agent (UA) File
-* Create a file called `user_agents.csv` and enter at least two lines of User Agent strings.
-
-### Create Output Folder
-* On your project's root directory, create a folder named **csvfiles**.
-* The output should be inside the **csvfiles** folder
-
-### Running The Script
-```
-$ python jasper.py
+# Assuming you followed the steps above & you use a Linux-based system.
+./jasper.py
 ```

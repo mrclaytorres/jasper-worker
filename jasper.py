@@ -281,7 +281,8 @@ if __name__ == '__main__':
             for composed_line in composed_list:
                 f_composed_writer.writerow(composed_line)
 
-        if len(prompts_block) > 50:
+        if len(split_prompts_blocks) > block_idx+1:
+            # If not finished
             hours_waiting = random.randint(1,4)
             print(f':: Waiting for { hours_waiting } hours...\n')
             time.sleep(60 * 60 * hours_waiting)

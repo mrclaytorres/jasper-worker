@@ -17,15 +17,37 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from pathlib import Path
 
+class Logger():
+    def __init__(self, group_id=0, prompt_id=0, max_group_id=0, max_prompt_id=0) -> None:
+        self.__group_id = group_id
+        self.__prompt_id = prompt_id
+        self.__max_group_id = max_group_id
+        self.__max_prompt_id = max_prompt_id
+
+    def print_full(self, message: str, include_prompt_id=True) -> None:
+        print(f':: Group [{ self.__group_id }/{ self.__max_group_id }] ' + (f'| Prompt [{ self.__prompt_id } / { self.__max_prompt_id }] ' if include_prompt_id else '') + f': { message }')
+
+    def print_limited(self, message: str) -> None:
+        print(f':: { message }')
+
+    def increment_prompt_id(self) -> None:
+        self.__prompt_id += 1
+
+    def increment_group_id(self) -> None:
+        self.__group_id += 1
+
 def checkfiles():
     g_version = Path('VERSION').read_text()
     g_required_files = [
         'chromedriver',
+        'creds.json',
+        'query.json',
+        'ua.json'
     ]
 
     def checkfile(filename):
         if not os.path.isfile(filename):
-            print(f":: File '{ filename }' couldn't be found, aborting.")
+            print(f"E: File '{ filename }' couldn't be found, aborting.")
             sys.exit(1)
 
         print(f":: File '{ filename }' was found, proceeding...")
@@ -36,49 +58,47 @@ def checkfiles():
     for rf in g_required_files:
         checkfile(rf)
 
-    print('All OK.')
+    print('\n:: All OK.\n')
 
 def get_random_user_agent():
     with open('ua.json', 'r', encoding='utf8') as fp_ua:
         return random.choice(json.load(fp_ua))
 
 def login_jasper():
-    # Login into Jasper and save the session cookies
-    print(':: Logging-in')
+    logger = Logger()
 
     chrome_options = webdriver.ChromeOptions()
 
     ua = get_random_user_agent()
-    print(f':: UA = { ua }')
+    logger.print_limited(f'UA = { ua }')
 
     chrome_options.add_argument(f'user-agent={ ua }')
     chrome_options.add_argument('user-data-dir=./chrome-prefs')
 
     driver_path = glob.glob('./chromedriver*')[0]
-    print(f':: Found driver path : {driver_path}')
 
-    print(':: Starting webdriver Chrome...')
+    logger.print_limited('Starting webdriver...')
     browser_handle = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
 
     screen_x = random.randint(1280, 1920)
     screen_y = random.randint(720, 1080)
 
-    print(f':: Setting random window size... ({ screen_x } x { screen_y })')
+    logger.print_limited(f'Window size : { screen_x } x { screen_y }')
     browser_handle.set_window_size(screen_x, screen_y)
 
-    print(':: Connecting...')
+    logger.print_limited('Connecting...')
     browser_handle.get('https://app.jasper.ai/')
 
     try:
-        print(':: Waiting until we have an email address field (Expecting a timeout otherwise)')
+        logger.print_limited('Checking for a login form...')
         WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div/div/div[3]/div/form/div[1]/div/input')))
     except:
         # Assume we're already logged-in
-        print('\n:: Caught TimeoutException, assuming already logged-in.')
+        logger.print_limited('webdriver is already logged-in.')
         return
 
     with open('creds.json', 'r', encoding='utf8') as creds_fp:
-        print(':: Submitting username keys...')
+        logger.print_limited('Submitting username keys...\n')
         username_value = json.load(creds_fp)['username']
         username_field = browser_handle.find_element(By.ID, 'email')
         username_field.clear()
@@ -87,20 +107,21 @@ def login_jasper():
 
         # User will now manually log-in
         # So we'll wait 10 minutes 'till we have a dashboard available
-        print(f'\n:: Please enter the code sent at { username_value } - waiting 10 minutes for you to do it.\n')
+        logger.print_limited(f'Please enter the code sent at { username_value } - waiting 10 minutes for you to manually enter it.\n')
         WebDriverWait(browser_handle, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')))
 
-    print(':: Found Jasper.ai dashboard')
-    print(':: Closing window.')
+    logger.print_limited('Found Jasper.ai dashboard')
+    logger.print_limited('Closing window.\n')
     browser_handle.close()
 
-def run_prompts(prompts_list):
+def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
     # Initialize a new browser window
     # Assume we're already logged-in
-    print('\n:: Starting prompt step')
-    print(f':: Prompts to generate : {len(prompts_list)}')
 
-    print(':: Initializing webdriver...')
+    print(f'\nStarting run_prompts\n')
+    print(f':: Prompts to generate : { len(prompts_list) }')
+
+    print(f':: Initializing webdriver...')
     chrome_options = webdriver.ChromeOptions()
 
     ua = get_random_user_agent()
@@ -110,32 +131,31 @@ def run_prompts(prompts_list):
     chrome_options.add_argument('user-data-dir=./chrome-prefs')
 
     driver_path = glob.glob('./chromedriver*')[0]
-    print(f':: Found driver path : {driver_path}')
 
-    print(':: Starting webdriver Chrome...')
+    print(f':: Starting webdriver...')
     browser_handle = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
 
     screen_x = random.randint(1280, 1920)
     screen_y = random.randint(720, 1080)
 
-    print(f':: Setting random window size... ({ screen_x } x { screen_y })')
+    print(f':: Window size : { screen_x } x { screen_y }')
     browser_handle.set_window_size(screen_x, screen_y)
 
-    print(':: Connecting...')
+    print(f':: Connecting...')
     browser_handle.get('https://app.jasper.ai/')
     time.sleep(3)
 
-    print(':: Entering edit page...')
+    print(f':: Entering edit page...')
 
     try_count = 0
 
     while True:
         if try_count == 5:
-            print('* Aborting script. Too many failed attempts to enter ql-editor !')
+            print(f'** E: Aborting script. Too many failed attempts to enter ql-editor !')
             sys.exit(1)
 
         try:
-            print(':: Trying to enter ql-editor...')
+            print(f':: Trying to enter ql-editor...')
             WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[2]/div[2]/div/div[2]/div[1]/button/button'))).click()
             time.sleep(3)
 
@@ -145,51 +165,53 @@ def run_prompts(prompts_list):
             break
 
         except:
-            print(f'* Warning : Failed to enter ql-editor ! (attempt { try_count })')
+            print(f'** W: Failed to enter ql-editor ! (attempt { try_count })')
             try_count += 1
             continue
 
     composed_list = []
 
-    for prompt_line in prompts_list:
+    for (idx, prompt_line) in enumerate(prompts_list):
+        logger = Logger(group_id, idx+1, max_group_id, len(prompts_list))
+
         try_count = 0
 
         while True:
             if try_count == 20:
-                print('* Aborting script. Too many failed attempts to clear ql-editor ! (Check internet connection ?)')
+                print('** E: Aborting script. Too many failed attempts to clear ql-editor ! (Check internet connection ?)')
                 sys.exit(1)
 
             try:
-                print('\n:: Clearing ql-editor')
+                logger.print_full('Clearing ql-editor...')
                 input_editor = WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 time.sleep(6)
                 input_editor.clear()
                 break
 
             except:
-                print(f'* Warning : Failed to clear ql-editor ! (attempt { try_count })')
+                print(f'** W: Failed to clear ql-editor ! (attempt { try_count })')
                 try_count += 1
                 continue
 
         time.sleep(2)
-        print(':: Sending prompt keys')
+        logger.print_full('Sending prompt keys...')
         input_editor.send_keys(prompt_line)
         time.sleep(2)
 
-        print(':: Highlighting the prompt and generating...')
+        logger.print_full('Highlighting the prompt and generating...')
         actions = ActionChains(browser_handle)
 
         actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
 
-        print(':: Waiting for Jasper to finish...')
+        logger.print_full('Waiting for Jasper to finish...')
 
         try_count = 0
         skip_prompt = False
 
         while True:
-            if try_count == 4:
-                print(f'* Warning : Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
-                print('* Skipping this prompt - perhaps this input contains sensitive material ?')
+            if try_count == 12:
+                print(f'** W: Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
+                print('** W: Skipping this prompt - perhaps this input contains sensitive material ?')
 
                 skip_prompt = True
                 break
@@ -197,17 +219,19 @@ def run_prompts(prompts_list):
             time.sleep(15)
 
             try:
-                print(':: Saving composed prompt...')
+                logger.print_full('Saving composed prompt...')
                 composed_prompt = browser_handle.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div/div[3]/div[2]/div/div[3]/div[1]/p[3]').text
                 composed_list.append([prompt_line, composed_prompt])
 
                 break
 
             except:
-                print(f'* Warning : could not find composed prompt - paragraph 3 not found (attempt { try_count })')
+                print(f'** W: could not find composed prompt - paragraph 3 not found (attempt { try_count })')
 
                 try_count += 1
                 continue
+
+        print()
 
         if skip_prompt:
             composed_list.append([prompt_line, 'LINE_SKIPPED'])
@@ -243,8 +267,10 @@ if __name__ == '__main__':
 
     output_prompts = []
 
-    for prompts_block in split_list(prompt_list, 25):
-        composed_list = run_prompts(prompts_block)
+    split_prompts_blocks = list(split_list(prompt_list, 25))
+
+    for (block_idx, prompts_block) in enumerate(split_prompts_blocks):
+        composed_list = run_prompts(prompts_block, block_idx+1, len(split_prompts_blocks))
 
         print('\n:: Saving composed prompts to filesystem...\n')
         os.makedirs('./output/', exist_ok=True)
@@ -255,13 +281,10 @@ if __name__ == '__main__':
             for composed_line in composed_list:
                 f_composed_writer.writerow(composed_line)
 
-        if len(prompts_block) < 50:
-            # No need to wait after finishing the last prompt block
-            break
-
-        hours_waiting = random.randint(1,4)
-        print(f':: Waiting for { hours_waiting } hours...\n')
-        time.sleep(60 * 60 * hours_waiting)
+        if len(prompts_block) > 50:
+            hours_waiting = random.randint(1,4)
+            print(f':: Waiting for { hours_waiting } hours...\n')
+            time.sleep(60 * 60 * hours_waiting)
 
     time_end = datetime.datetime.now().replace(microsecond=0)
     runtime = time_end - time_start

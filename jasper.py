@@ -15,15 +15,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 from pathlib import Path
-
-def check_exists_by_xpath(xpath):
-    try:
-        webdriver.find_element_by_xpath(xpath)
-    except NoSuchElementException:
-        return False
-    return True
 
 class Logger():
     def __init__(self, group_id=0, prompt_id=0, max_group_id=0, max_prompt_id=0) -> None:
@@ -215,61 +207,11 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
 
         while True:
             if try_count == 12:
-                # Check if the editor is stuck on loading / waiting
-                if check_exists_by_xpath('/html/body/div[1]/div/div[1]/div[1]/div/div[1]/div[4]/div/div[2]/div/div/button/div[3]'):
-                    # Re-establish a connection
-                    print('** W: Loader still present on page - re-establishing connection...')
-                    browser_handle.refresh()
+                print(f'** W: Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
+                print('** W: Skipping this prompt - perhaps this input contains sensitive material ?')
 
-                    while True:
-                        if try_count == 20:
-                            print('** E: Aborting script. Too many failed attempts to clear ql-editor ! (Check internet connection ?)')
-                            sys.exit(1)
-
-                        try:
-                            logger.print_full('Clearing ql-editor...')
-                            input_editor = WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
-                            time.sleep(6)
-                            input_editor.clear()
-                            break
-
-                        except:
-                            print(f'** W: Failed to clear ql-editor ! (attempt { try_count })')
-                            try_count += 1
-                            continue
-
-                    time.sleep(2)
-                    logger.print_full('Sending prompt keys...')
-                    input_editor.send_keys(prompt_line)
-                    time.sleep(2)
-
-                    logger.print_full('Highlighting the prompt and generating...')
-                    actions = ActionChains(browser_handle)
-
-                    actions.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
-
-                    logger.print_full('Waiting a minute...')
-                    time.sleep(60)
-
-                    try:
-                        # Moment of truth, if we still don't have a composed prompt, there's a problem with Jasper
-                        composed_prompt = browser_handle.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div/div[3]/div[2]/div/div[3]/div[1]/p[3]').text
-
-                        break
-
-                    except:
-                        print('** E: Too many failed attempts to generate prompt in nested condition !')
-                        print('      ... Refreshing the page and waiting again did not yield any results.')
-                        sys.exit(1)
-
-
-                else:
-                    # Skip prompt
-                    print(f'** W: Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
-                    print('** W: Skipping this prompt - perhaps this input contains sensitive material ?')
-
-                    skip_prompt = True
-                    break
+                skip_prompt = True
+                break
 
             time.sleep(15)
 
@@ -281,6 +223,8 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
                 break
 
             except:
+                print(f'** W: could not find composed prompt - paragraph 3 not found (attempt { try_count })')
+
                 try_count += 1
                 continue
 

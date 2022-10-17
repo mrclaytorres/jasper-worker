@@ -45,18 +45,15 @@ def checkfiles():
         'ua.json'
     ]
 
-    def checkfile(filename):
-        if not os.path.isfile(filename):
-            print(f"E: File '{ filename }' couldn't be found, aborting.")
-            sys.exit(1)
-
-        print(f":: File '{ filename }' was found, proceeding...")
-
     print(f'Welcome to Jasper Worker ({ g_version })')
     print("Starting checks")
 
     for rf in g_required_files:
-        checkfile(rf)
+        if not os.path.isfile(rf):
+            print(f"E: File '{ rf }' couldn't be found, aborting.")
+            sys.exit(1)
+
+        print(f":: File '{ rf }' was found, proceeding...")
 
     print('\n:: All OK.\n')
 

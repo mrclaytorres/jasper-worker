@@ -148,6 +148,7 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
     try_count = 0
 
     while True:
+
         if try_count == 5:
             print(f'** E: Aborting script. Too many failed attempts to enter ql-editor !')
             sys.exit(1)
@@ -156,12 +157,16 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
             print(f':: Trying to enter ql-editor...')
 
             WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div[3]/article/div/div[2]/button'))).click()
-            time.sleep(3)
+            time.sleep(5)
 
             break
 
         except:
             print(f'** W: Failed to enter ql-editor ! (attempt { try_count })')
+            print('** W: Re-connecting...')
+            browser_handle.get('https://app.jasper.ai/docs/new')
+            time.sleep(30)
+
             try_count += 1
             continue
 

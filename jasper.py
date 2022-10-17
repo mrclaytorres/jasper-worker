@@ -18,13 +18,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from pathlib import Path
 
-def check_exists_by_xpath(xpath):
-    try:
-        webdriver.find_element_by_xpath(xpath)
-    except NoSuchElementException:
-        return False
-    return True
-
 class Logger():
     def __init__(self, group_id=0, prompt_id=0, max_group_id=0, max_prompt_id=0) -> None:
         self.__group_id = group_id
@@ -147,7 +140,7 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
     browser_handle.set_window_size(screen_x, screen_y)
 
     print(f':: Connecting...')
-    browser_handle.get('https://app.jasper.ai/')
+    browser_handle.get('https://app.jasper.ai/docs/new')
     time.sleep(3)
 
     print(f':: Entering edit page...')
@@ -161,10 +154,8 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
 
         try:
             print(f':: Trying to enter ql-editor...')
-            WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[2]/div[2]/div/div[2]/div[1]/button/button'))).click()
-            time.sleep(3)
 
-            WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
+            WebDriverWait(browser_handle, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div[3]/article/div/div[2]/button'))).click()
             time.sleep(3)
 
             break
@@ -213,11 +204,29 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
         try_count = 0
         skip_prompt = False
 
+        composed_prompt = ""
+
         while True:
             if try_count == 12:
                 # Check if the editor is stuck on loading / waiting
-                if check_exists_by_xpath('/html/body/div[1]/div/div[1]/div[1]/div/div[1]/div[4]/div/div[2]/div/div/button/div[3]'):
+
+                try:
+                    WebDriverWait(browser_handle, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[1]/div[4]/div/div[2]/div/div/button/div[3]')))
+
+                    # Skip prompt
+                    print(f'** W: Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
+                    print('** W: Skipping this prompt - perhaps this input contains sensitive material ?')
+
+                    skip_prompt = True
+                    break
+
+                except:
+                    # We'll need to refresh
+                    print('** W: Editor not stuck, skipping line.')
+                    skip_prompt = True
+
                     # Re-establish a connection
+                    print('** W: Editor may be stuck.')
                     print('** W: Loader still present on page - re-establishing connection...')
                     browser_handle.refresh()
 
@@ -254,7 +263,6 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
                     try:
                         # Moment of truth, if we still don't have a composed prompt, there's a problem with Jasper
                         composed_prompt = browser_handle.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div/div[3]/div[2]/div/div[3]/div[1]/p[3]').text
-
                         break
 
                     except:
@@ -262,25 +270,15 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
                         print('      ... Refreshing the page and waiting again did not yield any results.')
                         sys.exit(1)
 
-
-                else:
-                    # Skip prompt
-                    print(f'** W: Too many failed attempts to find composed prompt ! (paragraph 3 not found after { try_count } attempts)')
-                    print('** W: Skipping this prompt - perhaps this input contains sensitive material ?')
-
-                    skip_prompt = True
-                    break
-
             time.sleep(15)
 
             try:
                 logger.print_full('Saving composed prompt...')
                 composed_prompt = browser_handle.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div/div[3]/div[2]/div/div[3]/div[1]/p[3]').text
-                composed_list.append([prompt_line, composed_prompt])
-
                 break
 
             except:
+                print(f'** W: Could not find composed prompt - attempt { try_count }')
                 try_count += 1
                 continue
 
@@ -289,6 +287,8 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
         if skip_prompt:
             composed_list.append([prompt_line, 'LINE_SKIPPED'])
             continue
+
+        composed_list.append([prompt_line, composed_prompt])
 
 
     print(':: Closing window.')

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import csv
+from curses import raw
+from genericpath import isfile
 import os
 import sys
 import random
@@ -15,8 +17,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 from pathlib import Path
+from itertools import islice
+from random import randint
 
 class Logger():
     def __init__(self, group_id=0, prompt_id=0, max_group_id=0, max_prompt_id=0) -> None:
@@ -106,7 +109,7 @@ def login_jasper():
         # User will now manually log-in
         # So we'll wait 10 minutes 'till we have a dashboard available
         logger.print_limited(f'Please enter the code sent at { username_value } - waiting 10 minutes for you to manually enter it.\n')
-        WebDriverWait(browser_handle, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div[1]/div[1]/div/div[2]/div[2]/div/div[1]/button[2]')))
+        WebDriverWait(browser_handle, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[1]/div/nav[1]/ul[3]/li/span/a')))
 
     logger.print_limited('Found Jasper.ai dashboard')
     logger.print_limited('Closing window.\n')
@@ -172,7 +175,27 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
 
     composed_list = []
 
+    print(':: Loading raw output file in memory... (if available)')
+
+    output_present = os.path.isfile('./output/composed.csv')
+
     for (idx, prompt_line) in enumerate(prompts_list):
+        force_skip = False
+
+        if output_present == True:
+            with open('./output/composed.csv', 'r', encoding='utf8') as fp_generated:
+                raw_generated = csv.reader(fp_generated, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+
+                for raw_line in raw_generated:
+                    if ((prompt_line in raw_line[0]) and (raw_line[1] != "LINE_SKIPPED")):
+                        # Prompt already generated
+                        force_skip = True
+                        break
+
+        if force_skip == True:
+            print(f'** Skipping already generated line at idx { idx+1 }')
+            continue
+
         logger = Logger(group_id, idx+1, max_group_id, len(prompts_list))
 
         try_count = 0
@@ -295,16 +318,22 @@ def run_prompts(prompts_list: list, group_id: int, max_group_id: int) -> list:
 
         composed_list.append([prompt_line, composed_prompt])
 
+        time.sleep(random.randint(10, 30))
 
+    fp_generated.close()
     print(':: Closing window.')
     browser_handle.quit()
 
     return composed_list
 
-def split_list(lst, n):
-    # Yield successive n-sized chunks from lst.
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+def random_chunk(li, min_chunk=1, max_chunk=3):
+    it = iter(li)
+    while True:
+        nxt = list(islice(it,randint(min_chunk,max_chunk)))
+        if nxt:
+            yield nxt
+        else:
+            break
 
 if __name__ == '__main__':
     checkfiles()
@@ -325,7 +354,7 @@ if __name__ == '__main__':
 
     output_prompts = []
 
-    split_prompts_blocks = list(split_list(prompt_list, 25))
+    split_prompts_blocks = list(random_chunk(prompt_list, 90, 150))
 
     for (block_idx, prompts_block) in enumerate(split_prompts_blocks):
         composed_list = run_prompts(prompts_block, block_idx+1, len(split_prompts_blocks))
@@ -333,7 +362,7 @@ if __name__ == '__main__':
         print('\n:: Saving composed prompts to filesystem...\n')
         os.makedirs('./output/', exist_ok=True)
 
-        with open(f'./output/composed_{now}.csv', 'a', encoding='utf8') as f_composed:
+        with open(f'./output/composed.csv', 'a', encoding='utf8') as f_composed:
             f_composed_writer = csv.writer(f_composed, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 
             for composed_line in composed_list:
@@ -341,9 +370,9 @@ if __name__ == '__main__':
 
         if len(split_prompts_blocks) > block_idx+1:
             # If not finished
-            hours_waiting = random.randint(1,4)
-            print(f':: Waiting for { hours_waiting } hours...\n')
-            time.sleep(60 * 60 * hours_waiting)
+            minutes_waiting = random.randint(30,120)
+            print(f':: Waiting for { minutes_waiting } minutes...\n')
+            time.sleep(60 * minutes_waiting)
 
     time_end = datetime.datetime.now().replace(microsecond=0)
     runtime = time_end - time_start

@@ -96,7 +96,7 @@ def work_jasper():
         WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[1]/div[3]/article/div/div[2]/button'))).click()
         time.sleep(5)
 
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[4]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[1]/div[4]/div/div/div/div[1]/div[2]/div[2]/button[3]'))).click()
         time.sleep(5)
 
     except:
@@ -112,7 +112,7 @@ def work_jasper():
         WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[5]/div/div/div/div/ul/li[1]/div'))).click()
         time.sleep(5)
 
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[4]/div/div[1]/div[2]/div[2]/button[3]'))).click()
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div[1]/div[4]/div/div/div/div[1]/div[2]/div[2]/button[3]'))).click()
         time.sleep(3)
 
     with open('query.csv', encoding='unicode_escape') as f:
@@ -128,11 +128,11 @@ def work_jasper():
             try:
                 
                 # input_editor = browser.find_element(By.CLASS_NAME, 'ql-editor')
-                input_editor = WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
+                input_editor = WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, 'ql-editor')))
                 input_editor.clear()
-                time.sleep(7)
+                time.sleep(6)
                 input_editor.send_keys(prompt)
-                time.sleep(8)
+                time.sleep(7)
 
                 # Perform a ENTER key press to generate a last child element
                 actions = ActionChains(browser)
@@ -156,7 +156,7 @@ def work_jasper():
 
                 # compose = browser.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[1]/div/div/div[5]/div/div[2]/div/div/button')
                 # compose.click()
-                time.sleep(15)
+                time.sleep(13)
 
                 composed_prompt = browser.find_element(By.CLASS_NAME, 'ql-editor')
                 composed_list.append(composed_prompt.text if composed_prompt.text != '' else 'Unexpected error')
@@ -164,7 +164,7 @@ def work_jasper():
                 prompt_list.append(prompt if prompt != '' else 'Unexpected error')
                 url_list.append(url if url != '' else 'Unexpected error')
                 city_list.append(city if city != '' else 'Unexpected error')
-                time.sleep(5)
+                time.sleep(3)
 
             except:
                 composed_list.append('Unexpected error')
